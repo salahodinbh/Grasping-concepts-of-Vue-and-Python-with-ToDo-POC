@@ -1,18 +1,25 @@
 <template>
   <div>
     <!-- <h1>{{ message }}</h1> -->
-    <h1>To-Do List POC</h1>
-    <div v-for="(task, index) in tasks" :key="index">
-      <p>{{ task }}</p>
-      <CommonButton text="Remove" @click="removeTask(index)"/>
+    <LoadingInit/>
+    <div v-if="!loading">
+      <h1>To-Do List POC</h1>
+      <div v-for="(task, index) in tasks" :key="index" class="flex items-center mb-2">
+        <p>{{ task }}</p>
+        <CommonButton text="Remove" @click="removeTask(index)" />
+      </div>
+      <div class="flex items-center">
+        <input v-model="newTask" @keydown.enter="addTask" placeholder="Add a new task" />
+        <CommonButton text="Add" @click="addTask" />
+      </div>
+      <router-view />
     </div>
-    <input v-model="newTask" @keydown.enter="addTask" placeholder="Add a new task"/>
-    <CommonButton text="Add" @click="addTask"/>
   </div>
 </template>
 
 <script>
 import CommonButton from './components/CommonButton.vue';
+import LoadingInit from './components/LoadingInit.vue';
 
 export default {
 
@@ -20,7 +27,8 @@ export default {
     return {
       //message: ""
       tasks: [],
-      newTask: ""
+      newTask: "",
+      loading: true
     };
   },
   mounted() {
@@ -30,7 +38,10 @@ export default {
         this.message = data;
       });
       */
-     this.fetchTasks();
+    this.fetchTasks();
+    setTimeout(() => {
+      this.loading = false;
+    }, 2000);
   },
   methods: {
     addTask() {
@@ -42,17 +53,17 @@ export default {
           },
           body: JSON.stringify({ task: this.newTask })
         })
-        .then(() => {
-          this.fetchTasks();
-          this.newTask = "";
-        });
+          .then(() => {
+            this.fetchTasks();
+            this.newTask = "";
+          });
       }
     },
     removeTask(index) {
       fetch(`http://localhost:5000/tasks/${index}`, {
         method: "DELETE"
       })
-      .then(() => {
+        .then(() => {
           this.fetchTasks();
         })
     },
@@ -66,6 +77,7 @@ export default {
   },
   components: {
     CommonButton,
+    LoadingInit,
   }
 };
 </script>

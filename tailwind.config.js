@@ -4,6 +4,9 @@ module.exports = {
     extend: {
       opacity: ['disabled'],
       cursor: ['disabled'],
+      animation:{
+        spin: 'spin 1s linear infinite',
+      }
     }
   },
   content: ["./src/**/*.{vue,js,ts,jsx,tsx}"],
