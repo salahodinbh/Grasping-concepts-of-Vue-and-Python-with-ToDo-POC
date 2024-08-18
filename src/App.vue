@@ -4,15 +4,18 @@
     <h1>To-Do List POC</h1>
     <div v-for="(task, index) in tasks" :key="index">
       <p>{{ task }}</p>
-      <button @click="removeTask(index)">Remove</button>
+      <CommonButton text="Remove" @click="removeTask(index)"/>
     </div>
     <input v-model="newTask" @keydown.enter="addTask" placeholder="Add a new task"/>
-    <button @click="addTask">Add</button>
+    <CommonButton text="Add" @click="addTask"/>
   </div>
 </template>
 
 <script>
+import CommonButton from './components/CommonButton.vue';
+
 export default {
+
   data() {
     return {
       //message: ""
@@ -60,6 +63,9 @@ export default {
           this.tasks = data;
         });
     }
+  },
+  components: {
+    CommonButton,
   }
 };
 </script>
