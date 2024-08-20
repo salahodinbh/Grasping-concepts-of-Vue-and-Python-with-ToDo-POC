@@ -6,10 +6,16 @@
     <transition name="fade" @before-enter="beforeEnter" @enter="enter">  
     <div class="fade" v-if="!loading">
         <div>
-          <h1>To-Do List POC</h1>
-          <div v-for="(task, index) in tasks" :key="index" class="flex items-center mb-2">
-            <p>{{ task }}</p>
-            <CommonButton text="Remove" @click="removeTask(index)" />
+          <h1 class="flex flex-col items-center">To-Do List POC</h1>
+            <div class="flex flex-row">
+            <div v-for="(task, index) in tasks" :key="index" class="flex items-center mb-2">
+              <p>{{ task }}</p>
+              <CommonButton text="Remove" @click="removeTask(index)" />
+              <CommonButton text="Complete" @click="completeTask(index)" />
+            </div>
+            <div v-for="(completedTask, index) in completedTasks" :key="index" class="flex items-center mb-2">
+              <p>{{ completedTask }}</p>
+            </div>
           </div>
           <div class="flex items-center">
             <input v-model="newTask" @keydown.enter="addTask" placeholder="Add a new task" />
@@ -32,6 +38,7 @@ export default {
     return {
       //message: ""
       tasks: [],
+      completedTasks: [],
       newTask: "",
       loading: true
     };
@@ -64,6 +71,19 @@ export default {
           });
       }
     },
+    completeTask(index) {
+      fetch(`http://localhost:5000/tasks/${index}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({index})
+      })
+        .then(() => {
+          this.fetchTasks();
+          this.fetchCompletedTasks();
+        });
+    },
     removeTask(index) {
       fetch(`http://localhost:5000/tasks/${index}`, {
         method: "DELETE"
@@ -77,6 +97,13 @@ export default {
         .then((response) => response.json())
         .then((data) => {
           this.tasks = data;
+        });
+    },
+    fetchCompletedTasks() {
+      fetch("http://localhost:5000/completedtasks")
+        .then((response) => response.json())
+        .then((data) => {
+          this.completedTasks = data;
         });
     },
     beforeEnter(el) {
