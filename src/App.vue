@@ -2,18 +2,23 @@
   <div>
     <!-- <h1>{{ message }}</h1> -->
     <LoadingInit/>
-    <div v-if="!loading">
-      <h1>To-Do List POC</h1>
-      <div v-for="(task, index) in tasks" :key="index" class="flex items-center mb-2">
-        <p>{{ task }}</p>
-        <CommonButton text="Remove" @click="removeTask(index)" />
-      </div>
-      <div class="flex items-center">
-        <input v-model="newTask" @keydown.enter="addTask" placeholder="Add a new task" />
-        <CommonButton text="Add" @click="addTask" />
-      </div>
+    <!-- Supposedly I can create css classes with the name "fade" and play with the transition, but for some reason it doesn't work -->
+    <transition name="fade" @before-enter="beforeEnter" @enter="enter">  
+    <div class="fade" v-if="!loading">
+        <div>
+          <h1>To-Do List POC</h1>
+          <div v-for="(task, index) in tasks" :key="index" class="flex items-center mb-2">
+            <p>{{ task }}</p>
+            <CommonButton text="Remove" @click="removeTask(index)" />
+          </div>
+          <div class="flex items-center">
+            <input v-model="newTask" @keydown.enter="addTask" placeholder="Add a new task" />
+            <CommonButton text="Add" @click="addTask" />
+          </div>
+        </div>  
       <router-view />
     </div>
+  </Transition>
   </div>
 </template>
 
@@ -73,6 +78,15 @@ export default {
         .then((data) => {
           this.tasks = data;
         });
+    },
+    beforeEnter(el) {
+      el.style.opacity = 0;
+    },
+    enter(el, done) {
+      el.offsetHeight; 
+      el.style.transition = 'opacity 1s';
+      el.style.opacity = 1;
+      done();
     }
   },
   components: {
@@ -81,3 +95,18 @@ export default {
   }
 };
 </script>
+
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+</style>
